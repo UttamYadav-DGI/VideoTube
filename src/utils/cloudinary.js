@@ -31,3 +31,5 @@ import fs from "fs"
         console.log(result);            
         }
     )
+
+    export {uploadOnCloudinary};
