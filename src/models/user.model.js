@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 const userSchema=new mongoose.Schema({
     username:{
@@ -29,7 +29,7 @@ const userSchema=new mongoose.Schema({
     },
     coverImage:{
         type:String,
-        required:true
+        
     },
     watchHistory:[{
         type:mongoose.Schema.Types.ObjectId,
@@ -46,11 +46,11 @@ const userSchema=new mongoose.Schema({
 
 },{timestamps:true})
 
-userSchema.pre("save",function(next){
+userSchema.pre("save",async function(next){
     if(!this.isModified("password")) return next();
-    this.password=  bcrypt.hash(this.password,10)
-    next()
-})
+    this.password= await bcrypt.hash(this.password,10);
+    next();
+});
 userSchema.methods.isPasswordCorrect= async function(password){
   return  await bcrypt.compare(password,this.password);
 }
@@ -59,15 +59,15 @@ userSchema.methods.generateAccessToken=function(){
   return  jwt.sign(
         {
             _id: this._id,
-            email:this.email,
-            username:this.username,
-            fullname:this.fullname,
+            // email:this.email,
+            // username:this.username,
+            // fullname:this.fullname,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expireIn:process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn:process.env.ACCESS_TOKEN_EXPIRY
         }
-    )
+    );
 }
 userSchema.methods.generateRefreshToken=function(){
     return  jwt.sign(
@@ -76,9 +76,9 @@ userSchema.methods.generateRefreshToken=function(){
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expireIn:process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn:process.env.REFRESH_TOKEN_EXPIRY
         }
-    )
+    );
 }
 
 export const User=mongoose.model("User",userSchema);
