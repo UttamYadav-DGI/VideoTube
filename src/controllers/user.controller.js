@@ -222,8 +222,8 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
         req.user?._id,
         {
             $set:{
-                this.fullname=fullname,
-                this.email:email
+                fullname,
+                email:email
             }
         },
         {new:true}
@@ -268,23 +268,25 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
    
     if(!coverImageLocalPath){
         throw new ApiError(401,"coverimage is missing")
-    };
+    }
     const coverImage=await uploadOnCloudinary(coverImageLocalPath)
     if(!coverImage.url){
         throw new ApiError(401,"error upload on cloudinary")
     }
 
-    const user= findByIdAndUpdate(
+    const user=await User.findByIdAndUpdate(
         req.user?._id,
         {
-            {
-                $set:{coverImage=coverImage.url}
+            $set:{
+                coverImage:coverImage.url
             }
         },
         {new :true}
     ).select("-password")
 
-   return res.status(200).json(
+   return res
+   .status(200)
+   .json(
     new ApiResponse(200,user,"coverimage updated successfully")
    )
 })
