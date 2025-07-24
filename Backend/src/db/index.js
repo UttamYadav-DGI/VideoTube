@@ -9,7 +9,8 @@ const connectDB=async()=>{
     }
     catch(error){
         console.log("mogodb not connected",error);
-        process.exit(1);
+        process.exit(1); //0 → Success (Normal exit) 1 → Uncaught fatal exception (Error exit)
+    
     }
 
 }

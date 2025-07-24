@@ -120,7 +120,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     if(!likedVideos || likedVideos.length===0){
         return res
         .status(200)
-        .json(new ApiResponse(200,{},"user not like any video"))
+        .json(new ApiResponse(200,[],"user not like any video"))
     }
     // Extract the video details from the likes
     const videoDetail= likedVideos.map((like)=>like.video)

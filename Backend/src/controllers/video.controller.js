@@ -15,11 +15,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
     //constructing match the object to filter videos
     const match={
-        ...(query? ( {title:{$regx:query,$options:"i"}}) : {}), // if query exists,match titles that contain the search term(case-insensetive) "i" denoted case-insensitive
-        ...(query? ({owner:mongoose.Types.ObjectId(userId)}) : {}),// we use ternary operator (q ? a:b)
+        ...(query? ( {title:{$regex:query,$options:"i"}}) : {}), // if query exists,match titles that contain the search term(case-insensetive) "i" denoted case-insensitive
+        ...(query? ({owner:mongoose.Types.ObjectId(req.user._id)}) : {}),// we use ternary operator (q ? a:b)
         }
     
-    const videos= Video.aggregate([
+    const videos= await Video.aggregate([
             {
                 $match:match
             },
@@ -35,9 +35,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 $project:{
                     videofile:1,
                     thumbnail:1,
-                    owner:{
-                        $first:1
-                    },
+                    videoByOwner:{ $arrayElemAt: ["$videoByOwner", 0] },
                     title:1,
                     description:1,
                     duration:1,
