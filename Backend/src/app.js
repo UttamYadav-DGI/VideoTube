@@ -4,11 +4,14 @@ import cors from 'cors'
 
 const app=express();
 
-const corsOptions={
-    origin:"http://localhost:5173",
-    method:"GET,POST,PUT,DELETE,PATCH,HEAD",
-    credentials:true //The credentials: true option in CORS (Cross-Origin Resource Sharing) allows the server to accept cookies, authorization headers, or TLS client certificates from cross-origin requests.
-}
+const corsOptions = {
+  origin: [
+    "http://localhost:5173", // for local development
+    "https://video-tube-5kwyh6iuh-uttamyadav-dgis-projects.vercel.app", // for production
+  ],
+  methods: "GET,POST,PUT,DELETE,PATCH,HEAD",
+  credentials: true,
+};
 app.use(cors(corsOptions));
 // app.use(cors({
 //     origin:process.env.CORS_ORIGIN,
