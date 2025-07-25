@@ -21,7 +21,7 @@ const Playlist = () => {
 
   const fetchUserPlaylists = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/v1/playlists/user/${user._id}`, {
+      const res = await axios.get(`https://videotube-1-ncqz.onrender.com/api/v1/playlists/user/${user._id}`, {
         withCredentials: true
       });
       setPlaylists(res.data.data || []);
@@ -35,7 +35,7 @@ const Playlist = () => {
   const handleUpdatePlaylist = async (playlistId, updatedData) => {
   try {
     await axios.patch(
-      `http://localhost:3000/api/v1/playlists/update-playlist/${playlistId}`,
+      `https://videotube-1-ncqz.onrender.com/api/v1/playlists/update-playlist/${playlistId}`,
       updatedData,
       { withCredentials: true }
     );
@@ -50,7 +50,7 @@ const handleDeletePlaylist = async (playlistId) => {
   
   try {
     await axios.delete(
-      `http://localhost:3000/api/v1/playlists/delete-playlist/${playlistId}`,
+      `https://videotube-1-ncqz.onrender.com/api/v1/playlists/delete-playlist/${playlistId}`,
       { withCredentials: true }
     );
     fetchUserPlaylists(); // Refresh playlists after deletion
@@ -62,7 +62,7 @@ const handleDeletePlaylist = async (playlistId) => {
 const handleRemoveVideo = async (playlistId, videoId) => {
   try {
     await axios.patch(
-      `http://localhost:3000/api/v1/playlists/remove/${playlistId}/${videoId}`,
+      `https://videotube-1-ncqz.onrender.com/api/v1/playlists/remove/${playlistId}/${videoId}`,
       {},
       { withCredentials: true }
     );
@@ -76,7 +76,7 @@ const handleRemoveVideo = async (playlistId, videoId) => {
     e.preventDefault();
     try {
       await axios.post(
-        `http://localhost:3000/api/v1/playlists/create-Playlist/${formData.videoId}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/playlists/create-Playlist/${formData.videoId}`,
         {
           name: formData.name,
           description: formData.description,

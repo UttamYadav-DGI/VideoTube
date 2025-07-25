@@ -9,7 +9,7 @@ const Logout = () => {
     const logoutUser = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/api/v1/users/logout",
+          "https://videotube-1-ncqz.onrender.com/api/v1/users/logout",
           {},
           {
             withCredentials: true, // This is required to send cookies

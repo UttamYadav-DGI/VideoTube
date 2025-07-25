@@ -35,7 +35,7 @@ const Register = () => {
     if (formData.coverImage) data.append("coverImage", formData.coverImage);
 
     try {
-      const res = await axios.post("http://localhost:3000/api/v1/users/register", data, {
+      const res = await axios.post("https://videotube-1-ncqz.onrender.com/api/v1/users/register", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

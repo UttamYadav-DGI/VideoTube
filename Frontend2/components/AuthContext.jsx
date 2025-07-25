@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/users/current-user', {
+      const response = await axios.get('https://videotube-1-ncqz.onrender.com/api/v1/users/current-user', {
         withCredentials: true
       });
       setUser(response.data.data);

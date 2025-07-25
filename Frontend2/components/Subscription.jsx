@@ -19,13 +19,13 @@ const Subscription = () => {
     try {
       // Fetch subscribers of the current user's channel
       const subscribersResponse = await axios.get(
-        `http://localhost:3000/api/v1/subscriptions/c/${user._id}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/c/${user._id}`,
         { withCredentials: true }
       );
 
       // Fetch channels that the current user is subscribed to
       const subscribedChannelsResponse = await axios.get(
-        `http://localhost:3000/api/v1/subscriptions/s/${user._id}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/s/${user._id}`,
         { withCredentials: true }
       );
 
@@ -41,7 +41,7 @@ const Subscription = () => {
   const handleToggleSubscription = async (channelId) => {
     try {
       await axios.post(
-        `http://localhost:3000/api/v1/subscriptions/c/${channelId}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/c/${channelId}`,
         {},
         { withCredentials: true }
       );

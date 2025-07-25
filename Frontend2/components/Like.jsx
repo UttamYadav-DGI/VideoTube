@@ -15,7 +15,7 @@ const Like = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get("http://localhost:3000/api/v1/likes/videos", {
+      const res = await axios.get("https://videotube-1-ncqz.onrender.com/api/v1/likes/videos", {
         withCredentials: true
       });
       // Check if response has data property and it contains videoDetail
@@ -37,7 +37,7 @@ const Like = () => {
     
     try {
       await axios.post(
-        `http://localhost:3000/api/v1/likes/toggle/v/${videoId}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/likes/toggle/v/${videoId}`,
         {},
         { withCredentials: true }
       );

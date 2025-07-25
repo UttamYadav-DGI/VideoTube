@@ -19,7 +19,7 @@ const History = () => {
   const fetchHistory = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:3000/api/v1/history',
+        'https://videotube-1-ncqz.onrender.com/api/v1/history',
         { withCredentials: true }
       );
       setHistory(response.data.data || []);
@@ -33,7 +33,7 @@ const History = () => {
   const handleRemoveFromHistory = async (videoId) => {
     try {
       await axios.delete(
-        `http://localhost:3000/api/v1/history/${videoId}`,
+        `https://videotube-1-ncqz.onrender.com/api/v1/history/${videoId}`,
         { withCredentials: true }
       );
       fetchHistory(); // Refresh history after removal
@@ -49,7 +49,7 @@ const History = () => {
 
     try {
       await axios.delete(
-        'http://localhost:3000/api/v1/history',
+        'https://videotube-1-ncqz.onrender.com/api/v1/history',
         { withCredentials: true }
       );
       setHistory([]); // Clear local state

@@ -23,7 +23,7 @@ const UploadVideo = ({ onClose }) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        'http://localhost:3000/api/v1/videos',
+        'https://videotube-1-ncqz.onrender.com/api/v1/videos',
         formData,
         {
           headers: {

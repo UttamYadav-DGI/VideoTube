@@ -20,7 +20,7 @@ const User = () => {
 
   const fetchUserData = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/v1/users/current-user", {
+      const res = await axios.get("https://videotube-1-ncqz.onrender.com/api/v1/users/current-user", {
         withCredentials: true
       });
       setUser(res.data.data);
@@ -58,7 +58,7 @@ const User = () => {
       });
 
       await axios.patch(
-        "http://localhost:3000/api/v1/users/update-account",
+        "https://videotube-1-ncqz.onrender.com/api/v1/users/update-account",
         data,
         {
           withCredentials: true,
