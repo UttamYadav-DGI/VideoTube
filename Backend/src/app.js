@@ -1,29 +1,23 @@
 import cookieParser from "cookie-parser"; 
 import express from "express";
 import cors from 'cors'
+const app = express();
 
-const app=express();
-
+// ✅ Must be ABOVE all routes and middleware
 const corsOptions = {
-  origin: [
-    "http://localhost:5173", // for local development
-    "https://video-tube-plum.vercel.app", // for production
-  ],
-  methods: "GET,POST,PUT,DELETE,PATCH,HEAD",
+  origin: "https://video-tube-plum.vercel.app",  // your frontend domain
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
   credentials: true,
 };
 app.use(cors(corsOptions));
-// app.use(cors({
-//     origin:process.env.CORS_ORIGIN,
-//     methods:"GET,POST,PUT,DELETE,PATCH,HEAD",
-//     Credential:true
-// }))
-app.use(express.json());
 
-app.use(express.json({limit:"16kb"}));//for json data
-app.use(express.urlencoded({extended:true,  limit:"16kb"}));// it's for url in (-,%20,$,)
-app.use(express.static("public"))// it's for storing files related data
-app.use(cookieParser()); // access user cookies and set cookies
+// ✅ Body parsers and cookie parser
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(cookieParser());
+
+// ✅ Serve static files (if needed)
+app.use(express.static("public"));
 
 //routes import
 import userRouter               from './routes/user.routes.js';
