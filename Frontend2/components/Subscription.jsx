@@ -17,17 +17,16 @@ const Subscription = () => {
 
   const fetchSubscribersAndChannels = async () => {
     try {
-      // Fetch subscribers of the current user's channel
-      const subscribersResponse = await axios.get(
-        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/c/${user._id}`,
-        { withCredentials: true }
-      );
+      setLoading(true);
 
-      // Fetch channels that the current user is subscribed to
-      const subscribedChannelsResponse = await axios.get(
-        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/s/${user._id}`,
-        { withCredentials: true }
-      );
+      const [subscribersResponse, subscribedChannelsResponse] = await Promise.all([
+        axios.get(`https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/c/${user._id}`, {
+          withCredentials: true,
+        }),
+        axios.get(`https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/s/${user._id}`, {
+          withCredentials: true,
+        }),
+      ]);
 
       setSubscribers(subscribersResponse.data.data || []);
       setSubscribedChannels(subscribedChannelsResponse.data.data || []);
@@ -45,11 +44,28 @@ const Subscription = () => {
         {},
         { withCredentials: true }
       );
-      // Refresh data after toggling subscription
-      fetchSubscribersAndChannels();
+
+      const isSubscribed = subscribedChannels.some((channel) => channel._id === channelId);
+
+      if (isSubscribed) {
+        setSubscribedChannels((prev) =>
+          prev.filter((channel) => channel._id !== channelId)
+        );
+      } else {
+        // Refetch single channel details (optional: ideally you maintain a list or get details on toggle)
+        const response = await axios.get(
+          `https://videotube-1-ncqz.onrender.com/api/v1/users/${channelId}`,
+          { withCredentials: true }
+        );
+        setSubscribedChannels((prev) => [...prev, response.data.data]);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to toggle subscription');
     }
+  };
+
+  const isChannelSubscribed = (channelId) => {
+    return subscribedChannels.some((channel) => channel._id === channelId);
   };
 
   if (loading) return <div className="text-center mt-8">Loading...</div>;
@@ -121,9 +137,13 @@ const Subscription = () => {
                 </div>
                 <button
                   onClick={() => handleToggleSubscription(channel._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                  className={`px-4 py-2 rounded transition-colors ${
+                    isChannelSubscribed(channel._id)
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
                 >
-                  Unsubscribe
+                  {isChannelSubscribed(channel._id) ? 'Unsubscribe' : 'Subscribe'}
                 </button>
               </div>
             ))
