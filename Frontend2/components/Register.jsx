@@ -39,6 +39,7 @@ const Register = () => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials:true,
       });
       alert(res.data.message);
     } catch (error) {
