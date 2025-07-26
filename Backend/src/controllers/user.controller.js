@@ -22,6 +22,13 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  // domain option is not needed if frontend and backend are on different top-level domains
+};
+
 const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, username, password } = req.body;
   if ([fullname, email, username, password].some((field) => !field?.trim())) {
@@ -67,32 +74,18 @@ const loginUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    domain: ".onrender.com",
-  };
-
   return res.status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(req.user?._id, { refreshToken: undefined }, { new: true });
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    domain: ".onrender.com",
-  };
-
   return res.status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse(200, {}, "User logged out"));
 });
 
@@ -109,11 +102,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-    const options = { httpOnly: true, secure: true, sameSite: "None", domain: ".onrender.com" };
-
     return res.status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
       .json(new ApiResponse(200, { accessToken, refreshToken }, "Access token refreshed"));
   } catch (error) {
     throw new ApiError(401, error.message || "Token invalid");
