@@ -126,7 +126,9 @@ const loginUser=asyncHandler(async(req,res)=>{
    //cookie security config
    const options={
     httpOnly:true,
-    secure:true
+    secure:true,
+    sameSite:"None",
+    domain:".onrender.com"
    }
    return res
    .status(200)
@@ -162,6 +164,8 @@ const logoutUser=asyncHandler(async(req,res)=>{
     const options={
         httpOnly:true,
         secure:true
+        sameSite:"None",
+    domain:".onrender.com"
        }
        return res
        .status(200)
