@@ -4,12 +4,11 @@ import Header from "../components/Header";
 import Sidebar from "../components/NavBar";
 import { AuthProvider } from "../components/AuthContext";
 import { ThemeProvider } from "../components/ThemeContext";
-import ProtectedRoute from '../components/ProtectedRoute';
 
 const App = () => {
   return (
     <AuthProvider>
-      <ProtectedRoute>
+     
         <ThemeProvider>
           <div className="flex flex-col h-screen">
             <Header />
@@ -21,7 +20,7 @@ const App = () => {
             </div>
           </div>
         </ThemeProvider>
-      </ProtectedRoute>
+    
     </AuthProvider>
   );
 };
