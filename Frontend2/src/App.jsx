@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import Sidebar from "../components/NavBar";
 import { AuthProvider } from "../components/AuthContext";
 import { ThemeProvider } from "../components/ThemeContext";
-import ProtectedRoute from "../components/ProtectedRoute"; // ✅ Import correctly
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const App = () => {
   return (
