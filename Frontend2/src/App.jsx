@@ -7,6 +7,7 @@ import { ThemeProvider } from '../components/ThemeContext';
 
 const App = () => {
   return (
+     <ProtectedRoute>
     <AuthProvider>
       <div className="flex flex-col h-screen">
          <ThemeProvider>
@@ -20,6 +21,7 @@ const App = () => {
         </div>
       </div>
     </AuthProvider>
+       </ProtectedRoute>
   );
 };
 
