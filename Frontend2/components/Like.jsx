@@ -14,7 +14,7 @@ const Like = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get("http://localhost:3000/api/v1/likes/video", {
+      const res = await axios.get("https://videotube-1-ncqz.onrender.com/api/v1/likes/video", {
         withCredentials: true,
       }); 
       const videos = res.data?.data || [];
