@@ -13,7 +13,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     if(!mongoose.Types.ObjectId.isValid(videoId)){
         throw new ApiError(401,"invalid video id")
     }
-    const videoExists= Video.findById(videoId);
+    const videoExists=await Video.findById(videoId);
     if(!videoExists){
         throw new ApiError(404,"video not exists")
     }
@@ -75,7 +75,8 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     )
     return res
     .status(200)
-    .json(new ApiResponse,existingCommentLike,"comment like successfully")
+    .json(new ApiResponse(200, commentLike, "Comment like successfully"));
+
     //TODO: toggle like on comment
 
 })
@@ -124,9 +125,11 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     }
     // Extract the video details from the likes
     const videoDetail= likedVideos.map((like)=>like.video)
-    return res
+   return res
     .status(200)
-    .json(new ApiResponse(200),videoDetail,"liked video fetch successfully")
+    .json(new ApiResponse(200, videoDetail, "Liked videos fetched successfully"));
+
+
 })
 
 export {
