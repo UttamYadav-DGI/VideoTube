@@ -1,143 +1,109 @@
-import mongoose, {isValidObjectId} from "mongoose"
-import {User} from "../models/user.model.js"
-import { Subscription } from "../models/subscription.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "./AuthContext";
 
+const Subscription = () => {
+  const { user } = useAuth();
+  const [subscribers, setSubscribers] = useState([]);
+  const [subscribedChannels, setSubscribedChannels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-const toggleSubscription = asyncHandler(async (req, res) => {
-    const {channelId} = req.params
-    if(!channelId || !isValidObjectId(channelId)){
-        throw new ApiError(500,"error while getting channel")
+  useEffect(() => {
+    if (user?._id) {
+      fetchSubscriptions();
     }
-    if(channelId.toString()===req.user?._id.toString()){
-        throw new ApiError(400,"you not subscribe your own channel")
-    }
-    const isSubscribed= await Subscription.findOne({
-        channel:channelId,
-        subscriber:req.user?._id
-    })
-    if(isSubscribed){
-        const unSubscribed=await Subscription.findByIdAndDelete(isSubscribed?._id)
-        if(!unSubscribed){
-            throw new ApiError(404,"error while unsubscribing channel")
-        }
-    }
-    else{
-        const subscribe=await Subscription.create({
-            channel:channelId,
-            subscriber:req.user?._id
-        })
-        if(!subscribe){
-            throw new ApiError(500,"error while subscribing channel")
-        }
-    }
-    // TODO: toggle subscription
-    return res
-    .status(200)
-    .json(new ApiResponse(200,{},`subscriber status ${!isSubscribed}  `))
-})
+  }, [user]);
 
-// controller to return subscriber list of a channel
-const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-    const {channelId} = req.params
-    if(!isValidObjectId(channelId)){
-        throw new ApiError(404,"invalid channelId")
-    }
-    const channel=await User.findById(channelId)
-    if(!channel){
-        throw new ApiError(404,"channel not found")
-    }
-    const subscribers= await Subscription.aggregate([
-        {
-            $match:{
-                channel:new mongoose.Types.ObjectId(channelId)
-            }
-        },
-        {
-            $lookup:{
-                from:"users",
-                localField:"subscriber",
-                foreignField:"_id",
-                as:"subscribers",
-                pipeline:[
-                    {
-                        $project:{
-                            _id:1,
-                            avatar:1,
-                            fullname:1,
-                            username:1
-                        }
-                    }
-                ]
-            }
-        },
-        // {
-        //     $addFields:{
-        //         subscriber:{$first:"$subscribers"}
-        //     }
-        // },
-        {
-            $project:{
-                subscribers:1
-            }
-        }
-    ])
-    if(!subscribers){
-        throw new ApiError(404,"subscibers not exists")
-    }
+  const fetchSubscriptions = async () => {
+    try {
+      // Fetch "Your Subscribers"
+      const subsRes = await axios.get(
+        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/c/${user._id}`,
+        { withCredentials: true }
+      );
+      // Flatten subscriber arrays
+      const subscriberList =
+        subsRes.data?.data?.flatMap((item) => item.subscribers || []) || [];
+      setSubscribers(subscriberList);
 
-    return res
-    .status(200)
-    .json(new ApiResponse(200,subscribers,"subscriber count fetched successfully"))
-})
+      // Fetch "Channels You're Subscribed To"
+      const channelsRes = await axios.get(
+        `https://videotube-1-ncqz.onrender.com/api/v1/subscriptions/s/${user._id}`,
+        { withCredentials: true }
+      );
+      // Flatten subscribed channels
+      const channelsList =
+        channelsRes.data?.data?.flatMap((item) => item.subscribedTo || []) || [];
+      setSubscribedChannels(channelsList);
 
-// controller to return channel list to which user has subscribed
-const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params
-    // console.log("subscriber",subscriberId)
-    if(!isValidObjectId(subscriberId)){
-        throw new ApiError(404,"invalid objectId")
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch subscriptions");
+    } finally {
+      setLoading(false);
     }
-    const subscriber=await User.findById(subscriberId)
-    if(!subscriber){
-        throw new ApiError(404,"subscriber not found")
-    }
-    const channel= await Subscription.aggregate([
-        {
-            $match:{
-                subscriber:new mongoose.Types.ObjectId(subscriberId)
-            }
-        },
-        {
-            $lookup:{
-                from:"users",
-                localField:"subsciber",
-                foreignField:"_id",
-                as:"subscribedTo"
-            }
-        },
-        {
-            $addFields:{
-                subscribedCount:{$size:"$subscribedTo"}
-            }
-        },
-        {
-            $project:{
-                subscribedCount:1,
-                subscribedTo:1
-            }
-        }
-    ]);
+  };
 
-    return res
-    .status(200)
-    .json(new ApiResponse(200,channel,"subscriber count fetched successfully"))
-})
+  if (loading) return <div className="text-center mt-8">Loading...</div>;
+  if (error) return <div className="text-center mt-8 text-red-600">{error}</div>;
 
-export {
-    toggleSubscription,
-    getUserChannelSubscribers,
-    getSubscribedChannels
-}
+  return (
+    <div className="max-w-5xl mx-auto p-6">
+      
+      {/* Your Subscribers */}
+      <section className="mb-10">
+        <h2 className="text-2xl font-bold mb-4">Your Subscribers</h2>
+        {subscribers.length === 0 ? (
+          <p className="text-gray-500">No subscribers yet</p>
+        ) : (
+          <div className="space-y-4">
+            {subscribers.map((sub) => (
+              <div
+                key={sub._id}
+                className="flex items-center p-4 bg-white rounded-xl shadow"
+              >
+                <img
+                  src={sub.avatar}
+                  alt={sub.username}
+                  className="w-12 h-12 rounded-full border object-cover"
+                />
+                <div className="ml-4">
+                  <h3 className="font-semibold">{sub.username}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Channels You're Subscribed To */}
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Channels You're Subscribed To</h2>
+        {subscribedChannels.length === 0 ? (
+          <p className="text-gray-500">You haven't subscribed to any channels</p>
+        ) : (
+          <div className="space-y-4">
+            {subscribedChannels.map((channel) => (
+              <div
+                key={channel._id}
+                className="flex items-center p-4 bg-white rounded-xl shadow"
+              >
+                <img
+                  src={channel.avatar}
+                  alt={channel.username}
+                  className="w-12 h-12 rounded-full border object-cover"
+                />
+                <div className="ml-4">
+                  <h3 className="font-semibold">{channel.username}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+    </div>
+  );
+};
+
+export default Subscription;
