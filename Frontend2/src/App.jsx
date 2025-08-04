@@ -1,45 +1,59 @@
 import React from "react";
-import {Outlet, Routes, Route, Navigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/NavBar";
-import { AuthProvider } from "../components/AuthContext";
+import { AuthProvider, useAuth } from "../components/AuthContext";
 import { ThemeProvider } from "../components/ThemeContext";
 import Login from "../components/Login";
 import Register from "../components/Register";
-import ProtectedRoute from "../components/ProtectedRoute";
 
-const Layout = () => (
-  <div className="flex flex-col h-screen">
-    <Header />
-    <div className="flex flex-1">
-      <Sidebar />
-      <main className="flex-1 p-4">
-        <Outlet />
-      </main>
-    </div>
-  </div>
-);
+const AppContent = () => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Checking authentication...
+      </div>
+    );
+  }
+
+  // Public pages allowed without login
+  const publicRoutes = ["/login", "/register"];
+
+  // If user not logged in and not on login/register → redirect to login
+  if (!user && !publicRoutes.includes(location.pathname)) {
+    return <Login />;
+  }
+
+  // If logged in → show the full app
+  if (user) {
+    return (
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex flex-1">
+          <Sidebar />
+          <main className="flex-1 p-4">
+            <Outlet />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // If not logged in but on login/register → show that page
+  if (!user && location.pathname === "/login") return <Login />;
+  if (!user && location.pathname === "/register") return <Register />;
+
+  return null;
+};
 
 const App = () => {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/" element={<div>Home Page</div>} />
-              <Route path="/dashboard" element={<div>Dashboard</div>} />
-            </Route>
-          </Route>
-
-          {/* Fallback route */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+        <AppContent />
       </ThemeProvider>
     </AuthProvider>
   );
