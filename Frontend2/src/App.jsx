@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/NavBar";
 import { AuthProvider, useAuth } from "../components/AuthContext";
@@ -19,15 +19,20 @@ const AppContent = () => {
     );
   }
 
-  // Public pages allowed without login
+  // Public pages
   const publicRoutes = ["/login", "/register"];
 
-  // If user not logged in and not on login/register → redirect to login
+  // Not logged in → send to login
   if (!user && !publicRoutes.includes(location.pathname)) {
-    return <Login />;
+    return <Navigate to="/login" replace />;
   }
 
-  // If logged in → show the full app
+  // Logged in and trying to go to login/register → send to home
+  if (user && publicRoutes.includes(location.pathname)) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Logged in → show app
   if (user) {
     return (
       <div className="flex flex-col h-screen">
@@ -42,7 +47,7 @@ const AppContent = () => {
     );
   }
 
-  // If not logged in but on login/register → show that page
+  // Not logged in but on login/register page → show that page
   if (!user && location.pathname === "/login") return <Login />;
   if (!user && location.pathname === "/register") return <Register />;
 
